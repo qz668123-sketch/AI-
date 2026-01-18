@@ -1,0 +1,17 @@
+
+{
+  "name": "Gemini AI Tour Guide",
+  "short_name": "AI 导游",
+  "description": "智能视觉语音导游应用",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

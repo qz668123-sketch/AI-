@@ -1,0 +1,8 @@
+{
+  "name": "Gemini Creative Studio",
+  "description": "An all-in-one AI creative suite for text, image, video generation, and real-time voice interaction using the latest Gemini models.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
