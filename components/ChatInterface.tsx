@@ -15,7 +15,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, setMessages }) 
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [messages, isTyping]);
 
@@ -38,14 +41,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, setMessages }) 
         model: 'gemini-3-flash-preview',
         contents: input,
         config: {
-          systemInstruction: "You are a helpful, creative, and professional assistant. Provide clear, well-formatted Markdown responses.",
-          temperature: 0.7,
+          systemInstruction: "You are an elegant, highly intelligent personal AI consultant. Your tone is sophisticated, brief but insightful. Use Markdown for clarity.",
+          temperature: 0.8,
         }
       });
 
       const aiMessage: Message = {
         role: 'model',
-        content: response.text || "I'm sorry, I couldn't process that request.",
+        content: response.text || "对不起，我暂时无法回应这个想法。",
         timestamp: Date.now()
       };
 
@@ -54,7 +57,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, setMessages }) 
       console.error("Chat Error:", error);
       setMessages(prev => [...prev, {
         role: 'model',
-        content: "Oops! Something went wrong while connecting to the AI. Please check your connection and try again.",
+        content: "连接中断，请稍后再次开启对话。",
         timestamp: Date.now()
       }]);
     } finally {
@@ -63,38 +66,46 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, setMessages }) 
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-900/30">
-      <div ref={scrollRef} className="flex-1 p-6 space-y-6 overflow-y-auto chat-container">
+    <div className="flex flex-col h-full bg-[#020617] relative overflow-hidden">
+      {/* Background Glows */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/5 blur-[120px] rounded-full pointer-events-none"></div>
+
+      <div ref={scrollRef} className="flex-1 p-6 md:p-12 space-y-8 overflow-y-auto z-10">
         {messages.map((msg, idx) => (
-          <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] md:max-w-[70%] rounded-2xl p-4 shadow-sm ${
+          <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
+            <div className={`max-w-[90%] md:max-w-[75%] rounded-[2rem] p-6 shadow-xl ${
               msg.role === 'user' 
-                ? 'bg-blue-600 text-white rounded-tr-none' 
-                : 'glass text-slate-200 rounded-tl-none border border-slate-700'
+                ? 'bg-blue-600 text-white rounded-tr-none shadow-blue-900/10' 
+                : 'glass text-slate-200 rounded-tl-none border border-white/5'
             }`}>
-              <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap">
+              <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap leading-relaxed tracking-wide font-medium">
                 {msg.content}
               </div>
-              <p className="text-[10px] mt-2 opacity-50 text-right">
-                {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </p>
+              <div className="flex items-center justify-end gap-2 mt-4 opacity-30 text-[9px] font-bold uppercase tracking-widest">
+                <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                <i className={`fas ${msg.role === 'user' ? 'fa-check-double' : 'fa-sparkles'}`}></i>
+              </div>
             </div>
           </div>
         ))}
         {isTyping && (
           <div className="flex justify-start">
-            <div className="glass rounded-2xl p-4 flex gap-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+            <div className="glass rounded-[2rem] px-6 py-4 flex gap-1.5 items-center">
+              <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></div>
+              <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.1s]"></div>
+              <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
             </div>
           </div>
         )}
       </div>
 
-      <div className="p-6 bg-slate-900/50 border-t border-slate-800">
-        <div className="max-w-4xl mx-auto flex gap-4 items-end">
-          <div className="flex-1 relative">
+      <div className="p-8 pb-12 md:pb-8 z-20">
+        <div className="max-w-4xl mx-auto">
+          <div className="glass rounded-[2.5rem] p-2 flex items-center gap-3 border border-white/10 shadow-2xl focus-within:border-blue-500/50 transition-all duration-500">
+            <button className="w-12 h-12 rounded-full flex items-center justify-center text-slate-500 hover:text-white transition-colors">
+              <i className="fas fa-plus"></i>
+            </button>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -104,16 +115,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, setMessages }) 
                   handleSend();
                 }
               }}
-              placeholder="Ask anything..."
-              className="w-full bg-slate-800 border border-slate-700 rounded-2xl py-4 px-5 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none max-h-40"
+              placeholder="分享你的见闻或提问..."
+              className="flex-1 bg-transparent border-none py-3 px-2 text-[15px] text-white focus:outline-none placeholder:text-slate-600 resize-none max-h-40"
               rows={1}
             />
             <button 
               onClick={handleSend}
               disabled={!input.trim() || isTyping}
-              className="absolute right-3 bottom-3 w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center hover:bg-blue-500 transition-all duration-300 disabled:opacity-20 disabled:grayscale shadow-lg shadow-blue-600/20 active:scale-90"
             >
-              <i className="fas fa-paper-plane"></i>
+              <i className="fas fa-paper-plane text-white text-sm"></i>
             </button>
           </div>
         </div>

@@ -60,8 +60,8 @@ const TourGuide: React.FC = () => {
         audio: true, 
         video: { 
           facingMode: 'environment',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
         } 
       });
 
@@ -139,10 +139,12 @@ const TourGuide: React.FC = () => {
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } }
           },
-          systemInstruction: `你是全球顶尖的 AI 智能导游。你能够通过手机镜头实时看见世界。
-          当你看到文物、景点或地标时，请用生动、博学、像人类导游一样的口吻开始讲解。
-          你可以讲历史、讲艺术、讲趣闻。用户随时可能打断你提问，请友好地回应。
-          如果光线太暗或看不清，请提示用户。`,
+          systemInstruction: `你是全球顶级旅行专家与 AI 智能导游。你充满人文情怀且博学多才。
+          当你看到文物、历史遗迹或特色地标时：
+          1. 请先用一句充满意境的感叹开始。
+          2. 讲解要深入浅出，像与老友漫步一样。
+          3. 强调建筑的历史感和细节之美。
+          4. 始终保持温文尔雅、专业的语气。`,
           outputAudioTranscription: {}
         }
       });
@@ -170,63 +172,96 @@ const TourGuide: React.FC = () => {
   useEffect(() => () => stopTour(), [stopTour]);
 
   return (
-    <div className="relative w-full h-full flex flex-col bg-black">
-      <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
+    <div className="relative w-full h-full flex flex-col bg-black overflow-hidden">
+      <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover opacity-90 transition-opacity duration-1000" />
       <canvas ref={canvasRef} className="hidden" />
 
-      {/* AR HUD */}
-      <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-6 pb-24 md:pb-6">
+      {/* AR HUD Layers */}
+      <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-8 pb-32 md:pb-8">
+        {/* Top Bar */}
         <div className="flex justify-between items-start pt-safe">
-          <div className="glass px-4 py-2 rounded-2xl flex items-center gap-2 border-l-4 border-orange-500">
-            <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-orange-500 animate-pulse' : 'bg-slate-500'}`}></div>
-            <p className="text-[10px] font-bold tracking-widest uppercase">{isActive ? 'LIVE SCAN' : 'READY'}</p>
+          <div className="glass px-5 py-2.5 rounded-2xl flex items-center gap-3 border border-white/10 shadow-2xl">
+            <div className={`w-2.5 h-2.5 rounded-full ${isActive ? 'bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.8)] animate-pulse' : 'bg-slate-600'}`}></div>
+            <div className="flex flex-col">
+              <span className="text-[9px] font-black tracking-[0.2em] text-white/50 leading-none">REAL-TIME</span>
+              <span className="text-xs font-bold text-white tracking-wide">{isActive ? '视觉解构中' : '设备就绪'}</span>
+            </div>
           </div>
-          <button className="w-10 h-10 rounded-full glass flex items-center justify-center pointer-events-auto text-white/50">
-            <i className="fas fa-cog"></i>
-          </button>
+          <div className="flex gap-3 pointer-events-auto">
+            <button className="w-12 h-12 rounded-2xl glass flex items-center justify-center text-white/70 hover:text-white transition-all hover:bg-white/10">
+              <i className="fas fa-expand-alt text-sm"></i>
+            </button>
+            <button className="w-12 h-12 rounded-2xl glass flex items-center justify-center text-white/70 hover:text-white transition-all hover:bg-white/10">
+              <i className="fas fa-ellipsis-h text-sm"></i>
+            </button>
+          </div>
         </div>
 
-        {/* Dynamic Scanning Frame */}
+        {/* Dynamic AR Frame */}
         {isActive && (
           <div className="flex-1 flex items-center justify-center">
-            <div className="w-72 h-72 border border-white/20 rounded-[2rem] relative">
-              <div className="absolute -top-1 -left-1 w-8 h-8 border-t-4 border-l-4 border-orange-500 rounded-tl-xl"></div>
-              <div className="absolute -top-1 -right-1 w-8 h-8 border-t-4 border-r-4 border-orange-500 rounded-tr-xl"></div>
-              <div className="absolute -bottom-1 -left-1 w-8 h-8 border-b-4 border-l-4 border-orange-500 rounded-bl-xl"></div>
-              <div className="absolute -bottom-1 -right-1 w-8 h-8 border-b-4 border-r-4 border-orange-500 rounded-br-xl"></div>
-              <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-orange-500 to-transparent animate-[scan_2.5s_infinite]"></div>
+            <div className="w-80 h-80 relative">
+               {/* Corner accents */}
+               <div className="absolute top-0 left-0 w-12 h-12 border-t-[3px] border-l-[3px] border-orange-500 rounded-tl-3xl opacity-80"></div>
+               <div className="absolute top-0 right-0 w-12 h-12 border-t-[3px] border-r-[3px] border-orange-500 rounded-tr-3xl opacity-80"></div>
+               <div className="absolute bottom-0 left-0 w-12 h-12 border-b-[3px] border-l-[3px] border-orange-500 rounded-bl-3xl opacity-80"></div>
+               <div className="absolute bottom-0 right-0 w-12 h-12 border-b-[3px] border-r-[3px] border-orange-500 rounded-br-3xl opacity-80"></div>
+               
+               {/* Floating Data Nodes */}
+               <div className="absolute -top-16 left-1/2 -translate-x-1/2 glass px-3 py-1 rounded-full text-[9px] font-bold text-orange-400 border border-orange-500/20 animate-bounce">
+                  AUTO FOCUS ACTIVE
+               </div>
+
+               {/* Scanning bar */}
+               <div className="absolute inset-0 overflow-hidden rounded-3xl">
+                  <div className="w-full h-1/2 bg-gradient-to-b from-orange-500/10 to-transparent absolute top-0 animate-[scan_3s_infinite] opacity-50"></div>
+                  <div className="w-full h-[1px] bg-orange-400/50 absolute top-0 animate-[scan_3s_infinite]"></div>
+               </div>
             </div>
           </div>
         )}
 
-        <div className="space-y-6 pointer-events-auto">
+        {/* Bottom Content Area */}
+        <div className="space-y-8 pointer-events-auto">
           {latestTranscription && (
-            <div className="glass p-5 rounded-3xl border border-white/10 shadow-2xl animate-fade-in mx-auto max-w-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <i className="fas fa-comment-dots text-orange-500 text-xs"></i>
-                <span className="text-[10px] font-bold text-orange-400 uppercase tracking-tighter">AI 讲解中</span>
+            <div className="glass p-6 rounded-[2.5rem] border border-white/10 shadow-2xl animate-fade-in mx-auto max-w-xl group">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full tour-gradient flex items-center justify-center shadow-inner">
+                  <i className="fas fa-feather-pointed text-[10px] text-white"></i>
+                </div>
+                <span className="text-[10px] font-black text-orange-400 uppercase tracking-[0.2em]">智能讲解</span>
               </div>
-              <p className="text-sm text-slate-100 leading-relaxed font-medium">{latestTranscription}</p>
+              <p className="text-[15px] text-slate-100 leading-relaxed font-medium tracking-wide">
+                {latestTranscription}
+              </p>
             </div>
           )}
 
-          <div className="flex justify-center items-center gap-6 pb-6">
+          <div className="flex justify-center items-center gap-10 pb-8">
              {!isActive ? (
                <button 
                 onClick={startTour}
                 disabled={isConnecting}
-                className="w-20 h-20 bg-orange-600 rounded-full flex flex-col items-center justify-center shadow-2xl border-4 border-white/20 hover:scale-110 active:scale-95 transition-all"
+                className="w-24 h-24 tour-gradient rounded-full flex flex-col items-center justify-center shadow-[0_0_40px_rgba(249,115,22,0.4)] border-[6px] border-white/10 hover:scale-110 active:scale-95 transition-all duration-500 group"
                >
-                 {isConnecting ? <i className="fas fa-spinner fa-spin text-white"></i> : <i className="fas fa-play text-white text-xl"></i>}
-                 <span className="text-[10px] font-bold mt-1 text-white">GO</span>
+                 <div className="w-full h-full rounded-full flex flex-col items-center justify-center group-hover:bg-white/10 transition-colors">
+                    {isConnecting ? (
+                      <i className="fas fa-circle-notch fa-spin text-white text-2xl"></i>
+                    ) : (
+                      <>
+                        <i className="fas fa-play text-white text-2xl ml-1"></i>
+                        <span className="text-[9px] font-black mt-2 text-white/80 tracking-widest">START</span>
+                      </>
+                    )}
+                 </div>
                </button>
              ) : (
                <button 
                 onClick={stopTour}
-                className="w-20 h-20 bg-red-600 rounded-full flex flex-col items-center justify-center shadow-2xl border-4 border-white/20 active:scale-95 transition-all"
+                className="w-24 h-24 bg-slate-900 rounded-full flex flex-col items-center justify-center shadow-2xl border-[6px] border-red-500/20 hover:border-red-500/40 active:scale-95 transition-all duration-500"
                >
-                 <i className="fas fa-stop text-white text-xl"></i>
-                 <span className="text-[10px] font-bold mt-1 text-white">STOP</span>
+                 <i className="fas fa-stop text-red-500 text-2xl"></i>
+                 <span className="text-[9px] font-black mt-2 text-red-500 tracking-widest uppercase">END</span>
                </button>
              )}
           </div>
@@ -235,13 +270,13 @@ const TourGuide: React.FC = () => {
 
       <style>{`
         @keyframes scan {
-          0% { transform: translateY(0); opacity: 0; }
+          0% { transform: translateY(-100%); opacity: 0; }
           50% { opacity: 1; }
-          100% { transform: translateY(288px); opacity: 0; }
+          100% { transform: translateY(200%); opacity: 0; }
         }
         @keyframes fade-in {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateY(20px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
     </div>

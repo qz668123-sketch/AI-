@@ -61,32 +61,31 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden flex-col md:flex-row">
+    <div className="flex h-screen bg-[#020617] text-slate-200 overflow-hidden flex-col md:flex-row">
       <Navigation activeMode={activeMode} setActiveMode={setActiveMode} />
       
       <main className="flex-1 flex flex-col relative overflow-hidden">
-        {/* Header - Hidden on Mobile Tour Mode for full screen */}
-        <header className={`h-14 md:h-16 flex items-center justify-between px-6 glass border-b border-slate-800 z-10 transition-transform ${
-          activeMode === AppMode.TOUR_GUIDE ? 'md:translate-y-0 -translate-y-full absolute w-full top-0' : ''
+        {/* Subtle Header */}
+        <header className={`h-16 md:h-20 flex items-center justify-between px-8 border-b border-white/5 z-30 transition-all duration-700 ${
+          activeMode === AppMode.TOUR_GUIDE ? 'translate-y-[-100%] absolute w-full' : 'relative'
         }`}>
-          <div className="flex items-center gap-2">
-            <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
-              activeMode === AppMode.TOUR_GUIDE ? 'bg-orange-500' : 'bg-blue-500'
-            }`}>
-              <i className="fas fa-sparkles text-white text-[10px]"></i>
-            </div>
-            <h1 className="text-lg font-bold tracking-tight">AI Guide</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-black tracking-tighter text-white uppercase italic">
+              AI <span className="text-blue-500">Laboratory</span>
+            </h1>
+            <div className="h-4 w-[1px] bg-white/10 hidden md:block"></div>
+            <span className="hidden md:block text-[10px] font-bold text-slate-500 tracking-widest uppercase">Version 3.0 Experimental</span>
           </div>
           
-          <div className="flex items-center gap-3">
-             <div className="flex items-center px-3 py-1 rounded-full bg-slate-800/80 text-[10px] font-medium text-slate-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-2 animate-pulse"></span>
-              Gemini 2.5
+          <div className="flex items-center gap-4">
+             <div className="flex items-center px-4 py-1.5 rounded-full bg-slate-900 border border-white/5 text-[10px] font-black text-slate-400 tracking-widest uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-3 shadow-[0_0_8px_#22c55e]"></span>
+              Connection Secure
             </div>
           </div>
         </header>
 
-        <div className="flex-1 relative overflow-hidden bg-black mb-16 md:mb-0">
+        <div className="flex-1 relative overflow-hidden mb-24 md:mb-0">
           {renderActiveMode()}
         </div>
       </main>
